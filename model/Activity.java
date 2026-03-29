@@ -39,5 +39,5 @@ public class Activity {
     private User user;
 
     @OneToMany(mappedBy = "activity",cascade=CascadeType.ALL, orphanRemoval = true )
-    private List<Recommendations> recommendations= new ArrayList<>();
+    private List<Recommendation> recommendations= new ArrayList<>();
 }

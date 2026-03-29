@@ -18,8 +18,14 @@ public class ActivityController {
     private final ActivityService activityService;
 
     @PostMapping
-    public ResponseEntity<ActivityResponse> trackActivity(@RequestBody ActivityRequest activityRequest){
+    public ResponseEntity<ActivityResponse> getUserActivity(@RequestBody ActivityRequest activityRequest){
         return ResponseEntity.ok(activityService.trackActivity(activityRequest));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ActivityResponse>> getUserActivity(@RequestHeader(value="X-User-ID") String userId){
+
+        return ResponseEntity.ok(activityService.getUserActivities(userId));
     }
 
 

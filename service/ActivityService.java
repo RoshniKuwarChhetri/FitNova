@@ -9,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import com.project.fitnova.model.Activity;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -46,5 +49,14 @@ public class ActivityService {
         response.setUpdatedAt(saveActivity.getCreatedAt());
         response.setUpdatedAt(saveActivity.getUpdatedAt());
         return response;
+    }
+     @GetMapping
+    public  List<ActivityResponse> getUserActivities(String userId) {
+        List<Activity>  activityList = activityRepository.findByUserId(userId);
+//        1. Activity--> ActivityResponse
+//        2.--> collect in list and return
+        return activityList.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 }
