@@ -8,6 +8,7 @@ import com.project.fitnova.model.User;
 import com.project.fitnova.repository.UserRepository;
 import com.project.fitnova.security.JwtUtils;
 import com.project.fitnova.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class AuthController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
         return ResponseEntity.ok(userService.register(registerRequest));
     }
     @PostMapping("/login")

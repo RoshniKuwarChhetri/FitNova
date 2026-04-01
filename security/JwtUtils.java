@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,10 +12,8 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 
-//package com.project.fitnova.security;
-
 @Component
-public class JwtUtils{
+public class JwtUtils {
 
     private String jwtSecret = "YS1zdHJpbmctc2VjcmV0LWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmc=";
     private int jwtExpirationMs = 172800000; // 48hr
@@ -29,10 +26,11 @@ public class JwtUtils{
         return null;
     }
 
-    public String generateToken(String userId,String role){
+    // ✅ FIXED: store role as STRING
+    public String generateToken(String userId, String role){
         return Jwts.builder()
                 .subject(userId)
-                .claim("roles", List.of(new SimpleGrantedAuthority(role)))
+                .claim("roles", List.of("ROLE_" + role)) // ✅ IMPORTANT
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + jwtExpirationMs))
                 .signWith(key())
