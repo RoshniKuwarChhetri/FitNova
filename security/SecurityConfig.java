@@ -22,10 +22,13 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register", "/api/user/login").permitAll()
+                        .requestMatchers("/swagger-ui.html"
+                                ,"/swagger-ui/**",
+                                "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/activities/**").hasRole("USER") // adjust if needed
                         .anyRequest().authenticated()
                 )
-                // ✅ IMPORTANT: add filter
+
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
 
