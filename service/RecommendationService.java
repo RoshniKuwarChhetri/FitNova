@@ -15,25 +15,35 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
+
     private final RecommendationRepository recommendationRepository;
     private final UserRepository userRepository;
     private final ActivityRepository activityRepository;
+    private final QnAService qnaService;
+
+    // ✅ Generate Recommendation
     public Recommendation generateRecommendation(RecommendationRequest request) {
-      User user =userRepository.findById((request.getUserId()))
-              .orElseThrow(()->new RuntimeException("User not Found:" + request.getUserId()));
-      Activity activity =activityRepository.findById((request.getActivityId()))
-                .orElseThrow(()->new RuntimeException("Activity not Found:" + request.getActivityId()));
 
-      Recommendation recommendation =Recommendation.builder()
-              .user(user)
-              .activity(activity)
-              .improvements(request.getImprovements())
-              .suggestions(request.getSuggestions())
-              .safty(request.getSafty())
-              .build();
-      Recommendation saveRecommendation = recommendationRepository.save(recommendation);
-      return saveRecommendation;
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not Found: " + request.getUserId()));
 
+        Activity activity = activityRepository.findById(request.getActivityId())
+                .orElseThrow(() -> new RuntimeException("Activity not Found: " + request.getActivityId()));
+
+        String aiResponse = qnaService.getAnswer(
+                "Give fitness recommendation for " + activity.getType()
+        );
+
+        Recommendation recommendation = Recommendation.builder()
+                .user(user)
+                .activity(activity)
+                .recommendation(aiResponse)
+                .improvements(request.getImprovements())
+                .suggestions(request.getSuggestions())
+                .safety(request.getSafety()) // FIXED NAME
+                .build();
+
+        return recommendationRepository.save(recommendation);
     }
 
     public List<Recommendation> getUserRecommendation(String userId) {
@@ -44,12 +54,3 @@ public class RecommendationService {
         return recommendationRepository.findByActivityId(activityId);
     }
 }
-
-
-
-
-
-
-
-
-

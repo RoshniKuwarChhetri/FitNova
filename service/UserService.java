@@ -12,37 +12,33 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // ✅ Register User
     public UserResponse register(RegisterRequest request) {
-        UserRole role =request.getRole() != null? request.getRole()
-                : UserRole.USER;
-        User user= User.builder()
+
+        User user = User.builder()
+                .name(request.getName())
                 .email(request.getEmail())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(role)
+                .role(UserRole.USER)
                 .build();
 
+        User savedUser = userRepository.save(user);
 
-
-        User savedUser =userRepository.save(user);
         return mapToResponse(savedUser);
     }
 
-    public UserResponse mapToResponse(User savedUser) {
-        UserResponse response = new UserResponse();
-        response.setId(savedUser.getId());
-        response.setEmail(savedUser.getEmail());
-        response.setPassword(savedUser.getPassword());
-        response.setFirstName(savedUser.getFirstName());
-        response.setLastName(savedUser.getLastName());
-        response.setCreatedAt(savedUser.getCreatedAt());
-        return response;
+    // ✅ Entity → DTO
+    public UserResponse mapToResponse(User user) {
 
-
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole().name()
+        );
     }
-
 }

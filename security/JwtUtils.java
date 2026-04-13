@@ -26,11 +26,11 @@ public class JwtUtils {
         return null;
     }
 
-    // ✅ FIXED: store role as STRING
+    //  store role as STRING
     public String generateToken(String userId, String role){
         return Jwts.builder()
                 .subject(userId)
-                .claim("roles", List.of("ROLE_" + role)) // ✅ IMPORTANT
+                .claim("roles", List.of("ROLE_" + role)) // IMPORTANT
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + jwtExpirationMs))
                 .signWith(key())

@@ -16,5 +16,7 @@ public class RecommendationRequest {
     private List<String> suggestions;
 
 
-    private List<String> safty;
+    private List<String> safety;
+
+
 }
