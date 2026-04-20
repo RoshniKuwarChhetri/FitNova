@@ -5,7 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,33 +14,34 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         try {
             String jwt = jwtUtils.getJwtFromHeader(request);
 
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                String userId = jwtUtils.getUserNameFromToken(jwt);
-
+                String userId = jwtUtils.getUserIdFromToken(jwt);
                 Claims claims = jwtUtils.fetchAllClaims(jwt);
 
-                // ✅ roles are now String list
                 List<String> roles = claims.get("roles", List.class);
 
-                var authorities = roles.stream()
+                var authorities = roles == null
+                        ? Collections.<SimpleGrantedAuthority>emptyList()
+                        : roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 

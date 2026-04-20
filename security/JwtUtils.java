@@ -15,45 +15,44 @@ import java.util.List;
 @Component
 public class JwtUtils {
 
-    private String jwtSecret = "YS1zdHJpbmctc2VjcmV0LWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmc=";
-    private int jwtExpirationMs = 172800000; // 48hr
+    private final String jwtSecret = "YS1zdHJpbmctc2VjcmV0LWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmc=";
+    private final int jwtExpirationMs = 172800000; // 48 hours
 
-    public String getJwtFromHeader(HttpServletRequest request){
+    public String getJwtFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
     }
 
-    //  store role as STRING
-    public String generateToken(String userId, String role){
+    public String generateToken(String userId, String role) {
         return Jwts.builder()
                 .subject(userId)
-                .claim("roles", List.of("ROLE_" + role)) // IMPORTANT
+                .claim("roles", List.of("ROLE_" + role))
                 .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + jwtExpirationMs))
-                .signWith(key())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith((SecretKey) key())
                 .compact();
     }
 
-    public boolean validateJwtToken(String jwtToken){
+    public boolean validateJwtToken(String jwtToken) {
         try {
             Jwts.parser()
                     .verifyWith((SecretKey) key())
                     .build()
                     .parseSignedClaims(jwtToken);
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
-    private Key key(){
+    private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String getUserNameFromToken(String jwt){
+    public String getUserIdFromToken(String jwt) {
         return Jwts.parser()
                 .verifyWith((SecretKey) key())
                 .build()
@@ -62,7 +61,7 @@ public class JwtUtils {
                 .getSubject();
     }
 
-    public Claims fetchAllClaims(String jwt){
+    public Claims fetchAllClaims(String jwt) {
         return Jwts.parser()
                 .verifyWith((SecretKey) key())
                 .build()
