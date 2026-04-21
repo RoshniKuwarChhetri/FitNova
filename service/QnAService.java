@@ -1,6 +1,7 @@
 package com.project.fitnova.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -33,8 +34,9 @@ public class QnAService {
 
         try {
             return webClient.post()
-                    .uri(geminiApiUrl + geminiApiKey)
-                    .header("Content-Type", "application/json")
+                    .uri(geminiApiUrl)
+                    .header("x-goog-api-key", geminiApiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(String.class)
@@ -42,7 +44,7 @@ public class QnAService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return e.getMessage();
+            return "Error while calling AI service: " + e.getMessage();
         }
     }
 }

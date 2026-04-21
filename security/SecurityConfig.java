@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -39,8 +40,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        .requestMatchers("/api/activities/**").hasRole("USER")
-                        .requestMatchers("/api/recommendations/**").hasRole("USER")
+                        .requestMatchers("/api/activities", "/api/activities/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/recommendations", "/api/recommendations/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -51,8 +52,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(customUserDetailService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customUserDetailService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

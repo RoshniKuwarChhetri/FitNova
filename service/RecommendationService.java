@@ -21,14 +21,13 @@ public class RecommendationService {
     private final ActivityRepository activityRepository;
     private final QnAService qnaService;
 
-    // ✅ Generate Recommendation
     public Recommendation generateRecommendation(RecommendationRequest request) {
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not Found: " + request.getUserId()));
+                .orElseThrow(() -> new RuntimeException("User not found: " + request.getUserId()));
 
         Activity activity = activityRepository.findById(request.getActivityId())
-                .orElseThrow(() -> new RuntimeException("Activity not Found: " + request.getActivityId()));
+                .orElseThrow(() -> new RuntimeException("Activity not found: " + request.getActivityId()));
 
         String aiResponse = qnaService.getAnswer(
                 "Give fitness recommendation for " + activity.getType()
@@ -40,7 +39,7 @@ public class RecommendationService {
                 .recommendation(aiResponse)
                 .improvements(request.getImprovements())
                 .suggestions(request.getSuggestions())
-                .safety(request.getSafety()) // FIXED NAME
+                .safety(request.getSafety())
                 .build();
 
         return recommendationRepository.save(recommendation);

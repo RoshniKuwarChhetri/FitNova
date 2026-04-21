@@ -9,6 +9,7 @@ import com.project.fitnova.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,6 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
 
-    // ✅ Track Activity
     public ActivityResponse trackActivity(ActivityRequest request) {
 
         User user = userRepository.findById(request.getUserId())
@@ -30,8 +30,12 @@ public class ActivityService {
                 .type(request.getType())
                 .duration(request.getDuration())
                 .caloriesBurned(request.getCaloriesBurned())
-                .startedAt(request.getStartedAt())
-                .additionalMetrics(request.getAdditionalMetrics()) // FIXED NAME
+                .startedAt(
+                        request.getStartedAt() != null
+                                ? request.getStartedAt()
+                                : LocalDateTime.now()
+                )
+                .additionalMetrics(request.getAdditionalMetrics())
                 .build();
 
         Activity savedActivity = activityRepository.save(activity);
@@ -39,7 +43,6 @@ public class ActivityService {
         return mapToResponse(savedActivity);
     }
 
-    // ✅ Convert Entity → DTO
     private ActivityResponse mapToResponse(Activity activity) {
         ActivityResponse response = new ActivityResponse();
 
@@ -49,14 +52,13 @@ public class ActivityService {
         response.setDuration(activity.getDuration());
         response.setCaloriesBurned(activity.getCaloriesBurned());
         response.setAdditionalMetrics(activity.getAdditionalMetrics());
-
-        response.setCreatedAt(activity.getCreatedAt()); // FIXED
+        response.setStartedAt(activity.getStartedAt());
+        response.setCreatedAt(activity.getCreatedAt());
         response.setUpdatedAt(activity.getUpdatedAt());
 
         return response;
     }
 
-    // ✅ Get Activities
     public List<ActivityResponse> getUserActivities(String userId) {
 
         List<Activity> activityList = activityRepository.findByUserId(userId);

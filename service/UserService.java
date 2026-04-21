@@ -16,8 +16,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // ✅ Register User
     public UserResponse register(RegisterRequest request) {
+
+        if (userRepository.findByEmail(request.getEmail()) != null) {
+            throw new RuntimeException("User already exists with email: " + request.getEmail());
+        }
 
         User user = User.builder()
                 .name(request.getName())
@@ -31,9 +34,7 @@ public class UserService {
         return mapToResponse(savedUser);
     }
 
-    // ✅ Entity → DTO
     public UserResponse mapToResponse(User user) {
-
         return new UserResponse(
                 user.getId(),
                 user.getName(),
