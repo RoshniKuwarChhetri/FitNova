@@ -1,55 +1,73 @@
 package com.project.fitnova.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.type.SqlTypes;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "recommendation")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Entity
 @Builder
 public class Recommendation {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidGenerator
     private String id;
-    private String type;
-    @Column(length = 2000)
-    private String recommendation;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> improvements;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> suggestions;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<String> safety;
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-    @UpdateTimestamp
-    private LocalDateTime updatedtAt;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false,foreignKey = @ForeignKey(name="fk_recommendations_users"))
-    @JsonIgnore
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "activity_id", nullable = false,foreignKey = @ForeignKey(name="fk_recommendations_activity"))
-    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "activity_id", nullable = false)
     private Activity activity;
 
+    @Column(columnDefinition = "TEXT")
+    private String recommendation;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "recommendation_improvements",
+            joinColumns = @JoinColumn(name = "recommendation_id")
+    )
+    @Column(name = "improvement", columnDefinition = "TEXT")
+    private List<String> improvements;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "recommendation_suggestions",
+            joinColumns = @JoinColumn(name = "recommendation_id")
+    )
+    @Column(name = "suggestion", columnDefinition = "TEXT")
+    private List<String> suggestions;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "recommendation_safety",
+            joinColumns = @JoinColumn(name = "recommendation_id")
+    )
+    @Column(name = "safety_item", columnDefinition = "TEXT")
+    private List<String> safety;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

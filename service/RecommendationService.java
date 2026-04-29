@@ -30,8 +30,12 @@ public class RecommendationService {
                 .orElseThrow(() -> new RuntimeException("Activity not found: " + request.getActivityId()));
 
         String aiResponse = qnaService.getAnswer(
-                "Give fitness recommendation for " + activity.getType()
+                "Give fitness recommendation for activity type " + activity.getType()
         );
+
+        if (aiResponse == null || aiResponse.isBlank()) {
+            aiResponse = "No recommendation available currently.";
+        }
 
         Recommendation recommendation = Recommendation.builder()
                 .user(user)

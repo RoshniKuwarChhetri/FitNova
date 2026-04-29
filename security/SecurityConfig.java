@@ -41,7 +41,10 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers("/api/activities", "/api/activities/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/recommendations", "/api/recommendations/**").hasAnyRole("USER", "ADMIN")
+
+                        // TEMP DEBUG
+                        .requestMatchers("/api/recommendations", "/api/recommendations/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
