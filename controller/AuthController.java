@@ -24,13 +24,13 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
-    // ✅ REGISTER
+
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
         return ResponseEntity.ok(userService.register(registerRequest));
     }
 
-    // ✅ LOGIN
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest){
 
